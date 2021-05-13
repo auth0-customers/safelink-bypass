@@ -1,0 +1,49 @@
+<html>
+<body>
+<script lang="JavaScript">
+  var getSearchParams = function (qs) {
+    var match,
+      pl     = /\+/g,  // Regex for replacing addition symbol with a space
+      search = /([^&=]+)=?([^&]*)/g,
+      decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
+      searchParams = {};
+
+    while (match = search.exec(qs))
+      searchParams[decode(match[1])] = decode(match[2]);
+
+    return searchParams;
+  }
+
+  var urlParams = getSearchParams(window.location.hash.substring(1));
+
+  // First check and make sure req.query.link exists and throw an error if it is not or it is in a bad format...
+  // Example link: https://jwt.io/#link=https%3A%2F%2Fmostekcm-webauthn.us.auth0.com%2Fpasswordless%2Fverify_redirect%3Fscope%3Dopenid%26response_type%3Dtoken%26redirect_uri%3D%26verification_code%3D368321%26connection%3Demail%26client_id%3DlazRFHWwM0jWgASZ6hAqs1ndaAPl1cSR%26email%3Dcarlos.mostek%2540auth0.com
+  var baseUrl = 'https://mostekcm-safelink.us.auth0.com/passwordless/verify_redirect';
+
+  if (!urlParams.link || !urlParams.link.startsWith(baseUrl)) {
+    alert("Bad Link: " + urlParams.link);
+  } else {
+    var linkOptions = getSearchParams(urlParams.link.substr(baseUrl.length));
+
+    var form = document.createElement("form");
+    form.setAttribute("method", "get");
+    form.setAttribute("action", baseUrl);
+    form.setAttribute("id", "bypassForm");
+
+    for (key in linkOptions) {
+      var inputField = document.createElement('input');
+      inputField.setAttribute("type", "hidden");
+      inputField.setAttribute("name", key);
+      inputField.setAttribute("value", linkOptions[key]);
+
+      form.append(inputField);
+    }
+
+    document.body.append(form);
+
+    document.getElementById('bypassForm').submit();
+  }
+
+</script>
+</body>
+</html>
